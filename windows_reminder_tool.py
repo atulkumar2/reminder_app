@@ -9,11 +9,12 @@ from tkinter import messagebox
 import sqlite3
 import datetime
 import threading
+import remconstant as rc
 
 # Database setup
 def init_db():
     """Initialize the SQLite database and create the reminders table."""
-    conn = sqlite3.connect("reminders.db")
+    conn = sqlite3.connect(rc.DB_NAME)
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS reminders (
@@ -39,12 +40,12 @@ def add_reminder():
         messagebox.showwarning("Input Error", "Please fill all fields!")
         return
 
-    conn = sqlite3.connect("reminders.db")
+    conn = sqlite3.connect(rc.DB_NAME)
     cursor = conn.cursor()
     cursor.execute("INSERT INTO reminders (event, date, time) VALUES (?, ?, ?)", (event, date, dt))
     conn.commit()
     conn.close()
-    messagebox.showinfo("Success", "Reminder added!")
+    messagebox.showinfo("Success", rc.SUCCESS_MSG_ADDED)
     event_entry.delete(0, tk.END)
     date_entry.delete(0, tk.END)
     time_entry.delete(0, tk.END)
@@ -53,7 +54,7 @@ def add_reminder():
 # Show reminders
 def show_reminders():
     """Show all reminders in the listbox."""
-    conn = sqlite3.connect("reminders.db")
+    conn = sqlite3.connect(rc.DB_NAME)
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM reminders")
     rows = cursor.fetchall()
@@ -69,7 +70,7 @@ def check_reminders():
     """
     while True:
         now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-        conn = sqlite3.connect("reminders.db")
+        conn = sqlite3.connect(rc.DB_NAME)
         cursor = conn.cursor()
         cursor.execute("SELECT event FROM reminders WHERE date || ' ' || time = ?", (now,))
         rows = cursor.fetchall()
